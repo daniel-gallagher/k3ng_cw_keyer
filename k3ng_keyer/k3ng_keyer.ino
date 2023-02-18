@@ -76,7 +76,7 @@ If you offer a hardware kit using this software, show your appreciation by sendi
   #include <FlashAsEEPROM.h>
 #else
   #include <avr/pgmspace.h>
-  #include <avr/wdt.h>
+  // #include <avr/wdt.h>
   #include <EEPROM.h>
 #endif //ARDUINO_SAM_DUE
 
@@ -204,8 +204,10 @@ If you offer a hardware kit using this software, show your appreciation by sendi
   #include "keyer_settings.h"
 #endif
 
-#if (paddle_left == 0) || (paddle_right == 0)
-  #error "You cannot define paddle_left or paddle_right as 0 to disable"
+#if !defined ARDUINO_RP2040
+  #if (paddle_left == 0) || (paddle_right == 0)
+    #error "You cannot define paddle_left or paddle_right as 0 to disable"
+  #endif
 #endif
 
 #if defined(FEATURE_BUTTONS)
@@ -974,6 +976,11 @@ void setup()
   // initialize_serial_ports();        // Goody - this is available for testing startup issues
   // initialize_debug_startup();       // Goody - this is available for testing startup issues
   // debug_blink();                    // Goody - this is available for testing startup issues
+
+  #if defined(ARDUINO_RP2040)
+    EEPROM.begin(1024);
+  #endif
+
   initialize_keyer_state();
   initialize_potentiometer();
   initialize_rotary_encoder();
@@ -4963,7 +4970,7 @@ void service_async_eeprom_write(){
       } else { // we're done
         async_eeprom_write = 0;
         last_async_eeprom_write_status = 0;
-        #if defined(ARDUINO_SAMD_VARIANT_COMPLIANCE)
+        #if defined(ARDUINO_SAMD_VARIANT_COMPLIANCE) || defined(ARDUINO_RP2040)
           EEPROM.commit();
         #endif
 
@@ -15014,7 +15021,7 @@ void serial_program_memory(PRIMARY_SERIAL_CLS * port_to_use)
     port_to_use->println(F("\n\rError"));
   }
 
-  #if defined(ARDUINO_SAMD_VARIANT_COMPLIANCE)
+  #if defined(ARDUINO_SAMD_VARIANT_COMPLIANCE) || defined(ARDUINO_RP2040)
     EEPROM.commit();
   #endif
 
@@ -15826,6 +15833,7 @@ byte play_memory(byte memory_number) {
 
 
   } //for (int y = (memory_start(memory_number)); (y < (memory_end(memory_number)+1)); y++)
+  return 0;
 
 }
 #endif
