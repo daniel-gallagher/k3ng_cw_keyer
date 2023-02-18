@@ -1,6 +1,7 @@
 // compile time features and options - comment or uncomment to add or delete features
 // FEATURES add more bytes to the compiled binary, OPTIONS change code behavior
 
+#define ARDUINO_RP2040
 
 // #define FEATURE_BUTTONS
 // #define FEATURE_COMMAND_MODE
